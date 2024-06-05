@@ -5,10 +5,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-
-func SetupRoutes(app *fiber.App){
+func SetupRoutes(app *fiber.App) {
 	app.Use(
 		logger.New(),
 	)
+	MakeStaticRoutes(app)
 	MakePublicRoutes(app)
 }
