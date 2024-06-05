@@ -11,3 +11,12 @@ up:
 down:
 	goose down
 
+
+
+app:
+	go clean
+	go build -ldflags="-w -s"
+
+
+clean:
+	go clean 
