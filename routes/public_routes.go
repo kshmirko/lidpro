@@ -1,9 +1,11 @@
 package routes
 
 import (
-	"bytes"
+	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/kshmirko/lidpro/utils"
 )
 
 func MakePublicRoutes(app *fiber.App) {
@@ -20,22 +22,17 @@ func MakePublicRoutes(app *fiber.App) {
 
 		// Чтение файла с данными -----------------------------------------------------------------
 		mpf, _ := c.FormFile("experiment-archivefile")
-
-		rdr, err := mpf.Open()
-		defer func() {
-			rdr.Close()
-		}()
-
+		vert_res_s := c.FormValue("experiment-vertres", "1500.0")
+		vert_res, err := strconv.ParseFloat(vert_res_s, 32)
+		if err != nil {
+			log.Println(err)
+		}
+		meas, err := utils.ReadZippedLidarArchive(mpf, vert_res)
+		log.Println(len(meas))
 		if err != nil {
 			return c.Render("upload", fiber.Map{"status": "Какие-то проблемы с загрузкой файла!"})
 		}
 
-		buf := bytes.NewBuffer(nil)
-		_, err = buf.ReadFrom(rdr)
-
-		if err != nil {
-			return c.Render("upload", fiber.Map{"status": "Какие-то проблемы при чтении файла!"})
-		}
 		// ----------------------------------------------------------------------------------------
 		return c.Render("upload", fiber.Map{"status": "Загрузка данных произведена успешно!"})
 	})
