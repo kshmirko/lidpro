@@ -1,9 +1,7 @@
 package main
 
 import (
-	"embed"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,8 +12,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//go:embed templates
-var viewAssets embed.FS
+///go:embed templates
+//var viewAssets embed.FS
 
 func main() {
 	err := godotenv.Load()
@@ -26,7 +24,8 @@ func main() {
 	meas := models.GetAllExperiments()
 	log.Println(meas)
 
-	engine := django.NewPathForwardingFileSystem(http.FS(viewAssets), "/templates", ".django")
+	engine := django.New("./templates", ".django")
+	//engine := django.NewPathForwardingFileSystem(http.FS(viewAssets), "/templates", ".django")
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})

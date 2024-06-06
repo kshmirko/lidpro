@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/css/style.css" />
-</head>
-<body>
-    <h1>{{ Fiber }}</h1>
-</body>
-</html>
-
+{% extends "layouts/main.django" %}
+{% block content %}
+<h1>Программа ЛидарПРО</h1>
+<article>
+<b>Несколько слов о самой програме:</b>
+</article>
+{% endblock content %}
