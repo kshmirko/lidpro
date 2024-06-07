@@ -434,6 +434,7 @@ button,
   border-radius: var(--standard-border-radius);
   box-shadow: none;
   max-width: 100%;
+  width: 100%;
   display: inline-block;
 }
 textarea,

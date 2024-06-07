@@ -10,6 +10,7 @@ import (
 	"math"
 	"mime/multipart"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
@@ -76,7 +77,41 @@ func CombineChannels(a, b []*LidarSingleFile) ([]LidarOneMeasurement, error) {
 
 func MakeAverageProfiles(data []LidarOneMeasurement, seconds int) ([]LidarOneMeasurement, error) {
 	// Заполнить
-	time.Now().Add(time.Second)
+	N := len(data)
+	i := 0
+	j := 0
+	ret := make([]LidarOneMeasurement, 0)
+
+	for i < N {
+		res := LidarOneMeasurement{}
+		j = i + 1
+		avg_dat := make([]float64, data[i].ProfLen)
+		copy(avg_dat, data[i].Dat)
+		avg_dak := make([]float64, data[i].ProfLen)
+		copy(avg_dak, data[i].Dak)
+		cnt := data[i].Count
+
+		for (j < N) && (data[j].DateTime.Sub(data[i].DateTime) < (time.Duration(seconds) * time.Second)) {
+			for k := range avg_dak {
+				avg_dat[k] = avg_dat[k] + data[j].Dat[k]
+				avg_dak[k] = avg_dak[k] + data[j].Dak[k]
+
+			}
+			cnt += data[j].Count
+			j += 1
+		}
+
+		res.DateTime = data[i].DateTime
+		res.RepRate = data[i].RepRate
+		res.Count = cnt * 10
+		res.ProfLen = data[i].ProfLen
+		res.Dak = avg_dak
+		res.Dat = avg_dat
+		ret = append(ret, res)
+		i = j
+	}
+
+	return ret, nil
 }
 
 func ReadZippedLidarFile(filez *zip.File, step float64) (*LidarSingleFile, error) {
@@ -221,5 +256,16 @@ func ReadZippedLidarArchive(files *multipart.FileHeader, step float64) ([]LidarO
 		return nil, err
 	}
 	log.Println(len(DAT), len(DAK))
-	return CombineChannels(DAT, DAK)
+	comb, err := CombineChannels(DAT, DAK)
+
+	if err != nil {
+		return nil, err
+	}
+
+	sort.Slice(comb,
+		func(i, j int) bool {
+			return comb[i].DateTime.Before(comb[j].DateTime)
+		})
+
+	return comb, nil
 }

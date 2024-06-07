@@ -49,6 +49,6 @@ func GetAllMeasurements() []Measurement {
 	}
 
 	tx.Commit()
-	con.Db.Close()
+	db.CloseConnection()
 	return ret
 }

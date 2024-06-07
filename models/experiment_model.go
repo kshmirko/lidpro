@@ -61,6 +61,31 @@ func GetAllExperiments() []Experiment {
 	}
 
 	tx.Commit()
-	con.Db.Close()
+	db.CloseConnection()
 	return ret
+}
+
+func CreateExperiment(e Experiment) (int, error) {
+	con := db.GetConnection()
+	log.Println(con)
+	tx := con.Db.MustBegin()
+	var id int64
+	qry := `
+		INSERT INTO 
+			EXPERIMENT(ID, START_TIME, TITLE, COMMENT, VERT_RES, ACCUM_TIME, ARCHIVE)
+		VALUES (NULL, ?,?,?,?,?,?)`
+
+	log.Println(e.StartTime)
+	time_1 := e.StartTime.Format("2006-01-02 15:04:05")
+	res, err := tx.Exec(qry, time_1, e.Title, e.Comment, e.VertRes, e.AccumTime, e.Archive)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+	} else {
+		id, _ = res.LastInsertId()
+		tx.Commit()
+	}
+
+	db.CloseConnection()
+	return int(id), nil
 }
