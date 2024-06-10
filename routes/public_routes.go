@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"log"
 	"strconv"
 	"strings"
@@ -14,7 +15,6 @@ import (
 func MakePublicRoutes(app *fiber.App) {
 	publ := app.Group("/public")
 	publ.Get("/", func(c *fiber.Ctx) error {
-		log.Println(c.AllParams())
 		return c.Render("index", fiber.Map{})
 	})
 
@@ -53,9 +53,7 @@ func MakePublicRoutes(app *fiber.App) {
 		datetime := c.FormValue("experiment-datetime", "2020-01-01T23:23")
 		datetime = strings.ReplaceAll(datetime, "T", " ")
 
-		log.Println(datetime)
 		dt, _ := time.Parse("2006-01-02 15:04", datetime)
-		log.Println(dt)
 
 		exp := models.Experiment{
 			StartTime: dt,
@@ -71,7 +69,62 @@ func MakePublicRoutes(app *fiber.App) {
 			log.Fatal(err)
 		}
 
+		// Готовим данные
+		meas_avg := make([]models.Measurement, len(avg))
+
+		for i := range meas_avg {
+			dat_tmp, err := json.Marshal(avg[i].Dat)
+			if err != nil {
+				log.Panic(err)
+			}
+			dak_tmp, err := json.Marshal(avg[i].Dak)
+			if err != nil {
+				log.Panic(err)
+			}
+			meas_avg[i] = models.Measurement{
+				ProfileTime:  avg[i].DateTime,
+				RepRate:      uint32(avg[i].RepRate),
+				ProfLen:      uint32(avg[i].ProfLen),
+				ProfCnt:      uint32(avg[i].Count),
+				ProfDat:      avg[i].Dat,
+				ProfDak:      avg[i].Dak,
+				ProfDataDat:  string(dat_tmp),
+				ProfDataDak:  string(dak_tmp),
+				ExperimentId: id,
+			}
+			models.CreateMeasurement(meas_avg[i])
+		}
+
 		// ----------------------------------------------------------------------------------------
 		return c.Render("upload", fiber.Map{"status": "Загрузка данных произведена успешно!"})
+	})
+
+	publ.Get("/view", func(c *fiber.Ctx) error {
+		m := models.GetAllExperimentsWithoutArchive()
+		return c.Render("view", fiber.Map{"exp": m})
+	})
+
+	publ.Get("/experiment/:id", func(c *fiber.Ctx) error {
+		id_s := c.Params("id")
+		id, _ := strconv.ParseInt(id_s, 10, 32)
+
+		curr_exp, err := models.GetExperimentById(id)
+		if err != nil {
+			log.Fatal(err)
+		}
+		meas, err := models.GetMeasurementsByExperimentId(id)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		arr := make([]models.MeasPlot, len(meas[0].ProfDak))
+		for i, _ := range arr {
+			arr[i].Alt = float64(i) * float64(curr_exp.VertRes)
+			arr[i].Ch1 = meas[0].ProfDat[i]
+			arr[i].Ch2 = meas[0].ProfDak[i]
+		}
+
+		//m := models.GetAllExperimentsWithoutArchive()
+		return c.Render("detail", fiber.Map{"exp": curr_exp, "meas": meas, "arr": arr})
 	})
 }

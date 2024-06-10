@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/css/style.css" />
     <link rel="icon" href="/static/favicon.ico">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src='https://cdn.plot.ly/plotly-2.32.0.min.js'></script>
 </head>
 <body>
     <header>
         <nav>
             <a href="/public">Главная</a>
             <a href="/public/upload">Выгрузка</a>
-            <a>Просмотр</a>
+            <a href="/public/view">Просмотр</a>
             <a>Обработка</a>
             <a>Экспорт</a>
         </nav>

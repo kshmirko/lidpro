@@ -1,0 +1,49 @@
+{% extends "layouts/main.django" %}
+{% block content %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart(){
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Alt');
+        data.addColumn('number', 'Ch1');
+        data.addColumn('number', 'Ch2');
+        data.addRows([
+            {% for a in arr %}
+            [{{a.Alt}},{{a.Ch1}},{{a.Ch2}}],
+            {% endfor %}
+        ]);
+
+        var options = {
+        hAxis: {
+          title: 'Высота'
+        },
+        vAxis: {
+          title: 'Отсчеты',
+          logScale: true
+        },
+        series: {
+          1: {curveType: 'function'}
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+
+    }
+
+
+</script>
+<h4>Эксперимент от {{exp.StartTime }}</h4>
+
+<div id="chart_div"></div>
+
+<ol>
+{% for m in meas %}
+<li>{{m.ProfileTime}}</li>
+{% endfor %}
+</ol>
+
+{% endblock content %}

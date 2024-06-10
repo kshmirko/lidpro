@@ -76,7 +76,7 @@ func CreateExperiment(e Experiment) (int, error) {
 		VALUES (NULL, ?,?,?,?,?,?)`
 
 	log.Println(e.StartTime)
-	time_1 := e.StartTime.Format("2006-01-02 15:04:05")
+	time_1 := e.StartTime.Format("2006-01-02 15:04")
 	res, err := tx.Exec(qry, time_1, e.Title, e.Comment, e.VertRes, e.AccumTime, e.Archive)
 	if err != nil {
 		log.Println(err)
@@ -88,4 +88,25 @@ func CreateExperiment(e Experiment) (int, error) {
 
 	db.CloseConnection()
 	return int(id), nil
+}
+
+func GetExperimentById(id int64) (Experiment, error) {
+	con := db.GetConnection()
+	tx := con.Db.MustBegin()
+
+	rows := tx.QueryRowx(`
+		SELECT ID, TITLE, COMMENT, START_TIME, VERT_RES, ACCUM_TIME 
+		FROM Experiment 
+		WHERE ID=?;
+		`, id)
+	exp := Experiment{}
+	err := rows.StructScan(&exp)
+	if err != nil {
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	db.CloseConnection()
+	return exp, err
 }

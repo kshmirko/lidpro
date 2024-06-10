@@ -1,0 +1,11 @@
+{% extends "layouts/main.django" %}
+{% block content %}
+<h4>В БД хранятся данные следующих экспериментов:</h4>
+
+<ol>
+    {% for e in exp %}
+    <li><a href="/public/experiment/{{e.Id}}">{{e.StartTime }} - {{e.Title}}</a></li>
+    {% endfor %}
+</ol>
+
+{% endblock content %}
