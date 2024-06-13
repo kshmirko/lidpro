@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    h2 Загрузка данных на сервер:
+    p
+    if status
+        mark=status    
+        p 
+    
+    
+
+    form(method="post" enctype="multipart/form-data")
+        p
+            strong Внимательно заполните все поля формы
+
+        p
+            label Дата эксперимента
+            
+            input(type="datetime-local" name="experiment-datetime" maxlength="100" required)
+        
+        p
+            label Название эксперимента
+
+            input(type="text" name="experiment-title" maxlength="100" minlength="10" size="80" required)
+        p
+            label Коментарий к эксперименту
+            textarea(name="experiment-comment" maxlength="512" minlength="0" rows="5" cols="80" required)
+        p
+            label Расстояние между соседними отсчетами (метры)
+            input(name="experiment-vertres" type="number" min="1500.0" max="1912.5"  value="1500" step="7.5" required)
+        p
+            label Время накопления (секунды)
+            input(name="experiment-accumtime" type="number" min="10" max="14400"  value="600" step="10" required)
+        p
+            label Архив с данными
+            input(name="experiment-archivefile" type="file" accept=".zip, .ZIP" required)
+        
+        div
+            input(type="submit")
+

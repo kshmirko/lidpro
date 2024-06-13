@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h4 В БД хранятся данные следующих экспериментов:
+  
+  ol 
+    each e in exp 
+      li
+        a(href="/api/experiment/#{e.Id}")= e.StartTime 

@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel="icon" href="/public/favicon.ico")
+  body
+    header
+        nav
+            a(href="/") Главная
+            a(href="/api/upload") Выгрузка
+            a(href="/api/view") Просмотр
+            a(href="/api/process") Обработка
+            a(href="/api/export") Экспорт
+    block content
