@@ -36,11 +36,13 @@ router.post('/', upload.single('experiment-archivefile'), async function(req, re
         AccumTime: req.body['experiment-accumtime'],
         Archive: data,
     }
-    // const insertedId = insertExperiment(rec)    
-
 
     const p = await readLidarZipBuffer(req.file.path, rec.AccumTime)
+    const insertedId1 = insertExperiment(rec)
+    const insertedId2 = insertMeasurements(p, insertedId1)
 
+
+    
 
     res.render('upload', {status:'Данные эксперимента успешно згружены  '})
 })

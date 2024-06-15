@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  section
+    
+    p Название эксперимента: #{exp.Title}
+    p Дата эксперимента: #{exp.StartTime}
+    a(class="button" href="/api/process/experiment/#{exp.Id}") Обработать весь эксперимент
+  
+  p Отдельные измерения
+  ul 
+    each m in meas 
+      li 
+        a(class="button" href="/api/process/#{exp.Id}/#{m.Id}") Обработать #{m.ProfTime} - #{m.StopTime}
+        

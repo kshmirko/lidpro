@@ -1,9 +1,19 @@
 const {db} = require("./../db")
 
+/**
+ * 
+ * @returns {List<Object>} - список объектов "Эксперимент"
+ */
 function getExperiments() {
     let experiments = []
     
-    const stmt = db.prepare(`SELECT * FROM Experiment`)
+    const stmt = db.prepare(`
+    SELECT 
+        * 
+    FROM Experiment
+    ORDER BY
+        START_TIME ASC;
+    `)
     for(const exp of stmt.iterate()){
         experiments.push({
             Id: exp.ID,
@@ -18,6 +28,11 @@ function getExperiments() {
     return  experiments
 }
 
+/**
+ * 
+ * @param {number} id - идентификатор эксперимента, целое число 
+ * @returns {Object} - структура, содержащая параметры эксперимента
+ */
 function getExperimentById(id) {
     const stmt = db.prepare(`SELECT * FROM Experiment WHERE ID = ?`)
     exp = stmt.get(id)
@@ -33,6 +48,12 @@ function getExperimentById(id) {
     }
 }
 
+
+/**
+ * 
+ * @param {Object} rec - структура, содержащая параметры эксперимента 
+ * @returns {number} - идентификатор добавленной записи
+ */
 function insertExperiment(rec) {
     const stmt = db.prepare(`
     INSERT INTO 
